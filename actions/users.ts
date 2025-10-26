@@ -1,7 +1,29 @@
 "use server"
 
 import { prisma } from "@/lib/db"
-import { requireAdmin } from "@/lib/clerk"
+import { requireAdmin, getCurrentUser as getClerkUser } from "@/lib/clerk"
+
+export async function getCurrentUserData() {
+  const clerkUser = await getClerkUser()
+
+  if (!clerkUser) {
+    return null
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { clerkId: clerkUser.id },
+    select: {
+      id: true,
+      clerkId: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      points: true,
+    },
+  })
+
+  return user
+}
 
 export async function getAllUsers() {
   await requireAdmin()
