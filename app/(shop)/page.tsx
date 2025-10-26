@@ -5,6 +5,10 @@ import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { ProductCard } from "@/components/product-card"
+import { GalleryGrid } from "@/components/gallery-grid"
+import { GallerySlider } from "@/components/gallery-slider"
+import { GalleryMasonry } from "@/components/gallery-masonry"
+import { GalleryCarousel } from "@/components/gallery-carousel"
 
 export default async function HomePage() {
   const [featuredProducts, newArrivals, galleryImages] = await Promise.all([
@@ -12,6 +16,11 @@ export default async function HomePage() {
     getProducts({ isNewArrival: true }),
     getGalleryImages(),
   ])
+
+  const blanketImages = galleryImages.filter((img) => img.category === "blankets")
+  const accessoryImages = galleryImages.filter((img) => img.category === "accessories")
+  const clothingImages = galleryImages.filter((img) => img.category === "clothing")
+  const homeDecorImages = galleryImages.filter((img) => img.category === "home-decor")
 
   return (
     <div className="flex flex-col">
@@ -36,7 +45,7 @@ export default async function HomePage() {
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild>
-                  <Link href="/gallery">View Gallery</Link>
+                  <Link href="/gallery">View Full Gallery</Link>
                 </Button>
               </div>
             </div>
@@ -76,21 +85,65 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Featured Products */}
-      <section className="bg-muted/30 py-16 md:py-24">
-        <div className="container">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold md:text-4xl">Featured Collection</h2>
-            <p className="mt-2 text-muted-foreground">Our most loved handmade pieces</p>
+      {blanketImages.length > 0 && (
+        <section className="bg-muted/30 py-16 md:py-24">
+          <div className="container">
+            <div className="mb-12">
+              <h2 className="text-3xl font-bold md:text-4xl">Cozy Blankets</h2>
+              <p className="mt-2 text-muted-foreground">Handcrafted blankets to keep you warm</p>
+            </div>
+            <GalleryGrid images={blanketImages.slice(0, 6)} />
           </div>
+        </section>
+      )}
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredProducts.slice(0, 6).map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+      {/* Featured Products */}
+      <section className="container py-16 md:py-24">
+        <div className="mb-12 text-center">
+          <h2 className="text-3xl font-bold md:text-4xl">Featured Collection</h2>
+          <p className="mt-2 text-muted-foreground">Our most loved handmade pieces</p>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {featuredProducts.slice(0, 6).map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
         </div>
       </section>
+
+      {accessoryImages.length > 0 && (
+        <section className="bg-accent/5 py-16 md:py-24">
+          <div className="container">
+            <div className="mb-12">
+              <h2 className="text-3xl font-bold md:text-4xl">Beautiful Accessories</h2>
+              <p className="mt-2 text-muted-foreground">Scarves, hats, and more to complete your look</p>
+            </div>
+            <GallerySlider images={accessoryImages} />
+          </div>
+        </section>
+      )}
+
+      {clothingImages.length > 0 && (
+        <section className="container py-16 md:py-24">
+          <div className="mb-12">
+            <h2 className="text-3xl font-bold md:text-4xl">Crochet Clothing</h2>
+            <p className="mt-2 text-muted-foreground">Unique wearable art pieces</p>
+          </div>
+          <GalleryMasonry images={clothingImages.slice(0, 8)} />
+        </section>
+      )}
+
+      {homeDecorImages.length > 0 && (
+        <section className="bg-primary/5 py-16 md:py-24">
+          <div className="container">
+            <div className="mb-12">
+              <h2 className="text-3xl font-bold md:text-4xl">Home Decor</h2>
+              <p className="mt-2 text-muted-foreground">Add a handmade touch to your space</p>
+            </div>
+            <GalleryCarousel images={homeDecorImages} />
+          </div>
+        </section>
+      )}
 
       {/* Why Choose Us */}
       <section className="container py-16 md:py-24">

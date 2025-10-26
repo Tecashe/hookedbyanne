@@ -4,6 +4,7 @@ const isPublicRoute = createRouteMatcher([
   "/",
   "/products(.*)",
   "/gallery(.*)",
+  "/try-on(.*)",
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/api/webhooks(.*)",
@@ -12,23 +13,16 @@ const isPublicRoute = createRouteMatcher([
 const isAdminRoute = createRouteMatcher(["/admin(.*)"])
 
 export default clerkMiddleware(async (auth, req) => {
-  const { userId, sessionClaims } = await auth()
-
-  // Protect admin routes
+  // Protect admin routes - check role in metadata
   if (isAdminRoute(req)) {
-    if (!userId) {
-      return Response.redirect(new URL("/sign-in", req.url))
-    }
-    // Check if user is admin (you'll need to set this in Clerk metadata)
-    const role = sessionClaims?.metadata?.role
-    if (role !== "admin") {
-      return Response.redirect(new URL("/", req.url))
-    }
+    await auth.protect((has) => {
+      return has({ role: "admin" })
+    })
   }
 
   // Protect non-public routes
-  if (!isPublicRoute(req) && !userId) {
-    return Response.redirect(new URL("/sign-in", req.url))
+  if (!isPublicRoute(req)) {
+    await auth.protect()
   }
 })
 
