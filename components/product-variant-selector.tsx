@@ -812,6 +812,249 @@
 // }
 
 
+// "use client"
+
+// import { useState, useRef, useEffect } from "react"
+// import { Button } from "@/components/ui/button"
+// import { Card, CardContent } from "@/components/ui/card"
+// import { Badge } from "@/components/ui/badge"
+// import { AddToCartButton } from "@/components/add-to-cart-button"
+// import { WishlistButton } from "@/components/wishlist-button"
+// import { cn } from "@/lib/utils"
+// import { Check, ChevronLeft, ChevronRight } from "lucide-react"
+
+// interface ProductVariant {
+//   id: string
+//   color: string | null
+//   colorHex: string | null
+//   size: string | null
+//   sku: string | null
+//   images: string[]
+//   price: number | null
+//   stock: number
+//   isAvailable: boolean
+// }
+
+// interface ProductVariantSelectorProps {
+//   product: {
+//     id: string
+//     name: string
+//     price: number
+//     images: string[]
+//     category: string
+//   }
+//   variants: ProductVariant[]
+//   onVariantChange?: (variantId: string) => void
+// }
+
+// export function ProductVariantSelector({ product, variants, onVariantChange }: ProductVariantSelectorProps) {
+//   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(variants[0] || null)
+//   const [scrollPosition, setScrollPosition] = useState(0)
+//   const carouselRef = useRef<HTMLDivElement>(null)
+
+//   // Get unique colors and sizes
+//   const colors = Array.from(new Set(variants.map((v) => v.color).filter(Boolean)))
+//   const sizes = Array.from(new Set(variants.map((v) => v.size).filter(Boolean)))
+
+//   const currentPrice = selectedVariant?.price || product.price
+//   const currentStock = selectedVariant?.stock || 0
+//   const currentImages = selectedVariant?.images?.length ? selectedVariant.images : product.images
+
+//   useEffect(() => {
+//     if (selectedVariant && onVariantChange) {
+//       onVariantChange(selectedVariant.id)
+//     }
+//   }, [selectedVariant, onVariantChange])
+
+//   const scroll = (direction: "left" | "right") => {
+//     if (carouselRef.current) {
+//       const scrollAmount = 300
+//       const newPosition =
+//         direction === "left" ? Math.max(0, scrollPosition - scrollAmount) : scrollPosition + scrollAmount
+
+//       carouselRef.current.scrollTo({
+//         left: newPosition,
+//         behavior: "smooth",
+//       })
+//       setScrollPosition(newPosition)
+//     }
+//   }
+
+//   useEffect(() => {
+//     const interval = setInterval(() => {
+//       if (carouselRef.current) {
+//         const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current
+//         if (scrollLeft + clientWidth >= scrollWidth - 10) {
+//           carouselRef.current.scrollTo({ left: 0, behavior: "smooth" })
+//           setScrollPosition(0)
+//         } else {
+//           carouselRef.current.scrollBy({ left: 100, behavior: "smooth" })
+//           setScrollPosition((prev) => prev + 100)
+//         }
+//       }
+//     }, 5000)
+
+//     return () => clearInterval(interval)
+//   }, [])
+
+//   return (
+//     <div className="space-y-6">
+//       {/* Color Selector with Auto-Scroll Carousel */}
+//       {colors.length > 0 && (
+//         <div>
+//           <h3 className="mb-4 text-sm font-bold uppercase tracking-wider">
+//             Color: <span className="text-primary">{selectedVariant?.color || "Select"}</span>
+//           </h3>
+
+//           <div className="relative">
+//             <div
+//               ref={carouselRef}
+//               className="flex gap-3 overflow-x-auto pb-2 scroll-smooth"
+//               style={{ scrollBehavior: "smooth" }}
+//             >
+//               {colors.map((color) => {
+//                 const variant = variants.find((v) => v.color === color)
+//                 const isSelected = selectedVariant?.color === color
+//                 const isAvailable = variant?.isAvailable && (variant?.stock || 0) > 0
+
+//                 return (
+//                   <button
+//                     key={color}
+//                     onClick={() => variant && setSelectedVariant(variant)}
+//                     disabled={!isAvailable}
+//                     className={cn(
+//                       "group relative h-20 w-20 rounded-full border-3 transition-all hover:scale-110 flex-shrink-0 shadow-md hover:shadow-lg",
+//                       isSelected ? "border-primary ring-4 ring-primary ring-offset-2 shadow-lg" : "border-gray-200",
+//                       !isAvailable && "opacity-40 cursor-not-allowed hover:scale-100",
+//                     )}
+//                     title={color || undefined}
+//                   >
+//                     <div
+//                       className="h-full w-full rounded-full"
+//                       style={{ backgroundColor: variant?.colorHex || color?.toLowerCase() }}
+//                     />
+//                     {isSelected && (
+//                       <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/20">
+//                         <Check className="h-7 w-7 text-white drop-shadow-lg" />
+//                       </div>
+//                     )}
+//                     {!isAvailable && (
+//                       <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50">
+//                         <span className="text-xs text-white font-bold">Out</span>
+//                       </div>
+//                     )}
+//                   </button>
+//                 )
+//               })}
+//             </div>
+
+//             {colors.length > 4 && (
+//               <>
+//                 <Button
+//                   variant="ghost"
+//                   size="icon"
+//                   className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-14 bg-white shadow-lg hover:bg-gray-50 rounded-full z-10"
+//                   onClick={() => scroll("left")}
+//                 >
+//                   <ChevronLeft className="h-5 w-5" />
+//                 </Button>
+//                 <Button
+//                   variant="ghost"
+//                   size="icon"
+//                   className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-14 bg-white shadow-lg hover:bg-gray-50 rounded-full z-10"
+//                   onClick={() => scroll("right")}
+//                 >
+//                   <ChevronRight className="h-5 w-5" />
+//                 </Button>
+//               </>
+//             )}
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Size Selector */}
+//       {sizes.length > 0 && (
+//         <div>
+//           <h3 className="mb-4 text-sm font-bold uppercase tracking-wider">
+//             Size: <span className="text-primary">{selectedVariant?.size || "Select"}</span>
+//           </h3>
+//           <div className="flex flex-wrap gap-3">
+//             {sizes.map((size) => {
+//               const variant = variants.find(
+//                 (v) => v.size === size && (!selectedVariant?.color || v.color === selectedVariant.color),
+//               )
+//               const isSelected = selectedVariant?.size === size
+//               const isAvailable = variant?.isAvailable && (variant?.stock || 0) > 0
+
+//               return (
+//                 <Button
+//                   key={size}
+//                   variant={isSelected ? "default" : "outline"}
+//                   size="lg"
+//                   onClick={() => variant && setSelectedVariant(variant)}
+//                   disabled={!isAvailable}
+//                   className={cn(
+//                     "font-semibold shadow-md hover:shadow-lg transition-all",
+//                     isSelected && "shadow-lg",
+//                     !isAvailable && "opacity-50",
+//                   )}
+//                 >
+//                   {size}
+//                 </Button>
+//               )
+//             })}
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Variant Info Card - Professional styling */}
+//       {selectedVariant && (
+//         <Card className="border-2 border-primary bg-gradient-to-br from-primary/5 to-primary/10 shadow-lg">
+//           <CardContent className="p-6">
+//             <div className="flex items-center justify-between">
+//               <div>
+//                 <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Selected Variant</p>
+//                 <p className="text-lg font-semibold mt-1">
+//                   {selectedVariant.color && `${selectedVariant.color}`}
+//                   {selectedVariant.color && selectedVariant.size && " • "}
+//                   {selectedVariant.size && `${selectedVariant.size}`}
+//                 </p>
+//               </div>
+//               <div className="text-right">
+//                 <p className="text-3xl font-bold text-primary">${currentPrice.toFixed(2)}</p>
+//                 {currentStock > 0 ? (
+//                   <Badge className="bg-green-500/20 text-green-700 border-green-500/30 mt-2 font-semibold">
+//                     {currentStock} in stock
+//                   </Badge>
+//                 ) : (
+//                   <Badge variant="destructive" className="mt-2 font-semibold">
+//                     Out of Stock
+//                   </Badge>
+//                 )}
+//               </div>
+//             </div>
+//           </CardContent>
+//         </Card>
+//       )}
+
+//       {/* Action Buttons - Prominent and professional */}
+//       <div className="flex gap-3 flex-col sm:flex-row pt-4">
+//         <AddToCartButton
+//           product={{
+//             ...product,
+//             price: currentPrice,
+//             images: currentImages,
+//             stock: currentStock,
+//           }}
+//           variantId={selectedVariant?.id}
+//         />
+//         <WishlistButton productId={product.id} />
+//       </div>
+//     </div>
+//   )
+// }
+
+
 "use client"
 
 import { useState, useRef, useEffect } from "react"
@@ -848,13 +1091,15 @@ interface ProductVariantSelectorProps {
 }
 
 export function ProductVariantSelector({ product, variants, onVariantChange }: ProductVariantSelectorProps) {
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(variants[0] || null)
+  const [selectedColor, setSelectedColor] = useState<string | null>(variants[0]?.color || null)
+  const [selectedSize, setSelectedSize] = useState<string | null>(variants[0]?.size || null)
   const [scrollPosition, setScrollPosition] = useState(0)
   const carouselRef = useRef<HTMLDivElement>(null)
 
-  // Get unique colors and sizes
-  const colors = Array.from(new Set(variants.map((v) => v.color).filter(Boolean)))
-  const sizes = Array.from(new Set(variants.map((v) => v.size).filter(Boolean)))
+  const colors = Array.from(new Set(variants.map((v) => v.color).filter((c): c is string => c !== null)))
+  const sizes = Array.from(new Set(variants.map((v) => v.size).filter((s): s is string => s !== null)))
+
+  const selectedVariant = variants.find((v) => v.color === selectedColor && v.size === selectedSize) || variants[0]
 
   const currentPrice = selectedVariant?.price || product.price
   const currentStock = selectedVariant?.stock || 0
@@ -897,13 +1142,40 @@ export function ProductVariantSelector({ product, variants, onVariantChange }: P
     return () => clearInterval(interval)
   }, [])
 
+  const handleColorSelect = (color: string) => {
+    setSelectedColor(color)
+    // Find a variant with this color
+    const variantWithColor = variants.find((v) => v.color === color)
+    if (variantWithColor && variantWithColor.size) {
+      setSelectedSize(variantWithColor.size)
+    }
+  }
+
+  const handleSizeSelect = (size: string) => {
+    // Check if this size exists with current color
+    const variantWithColorAndSize = selectedColor
+      ? variants.find((v) => v.color === selectedColor && v.size === size)
+      : null
+
+    if (variantWithColorAndSize) {
+      setSelectedSize(size)
+    } else {
+      // If not, find any variant with this size
+      const variantWithSize = variants.find((v) => v.size === size)
+      if (variantWithSize && variantWithSize.color) {
+        setSelectedColor(variantWithSize.color)
+        setSelectedSize(size)
+      }
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Color Selector with Auto-Scroll Carousel */}
       {colors.length > 0 && (
         <div>
           <h3 className="mb-4 text-sm font-bold uppercase tracking-wider">
-            Color: <span className="text-primary">{selectedVariant?.color || "Select"}</span>
+            Color: <span className="text-primary">{selectedColor || "Select"}</span>
           </h3>
 
           <div className="relative">
@@ -914,13 +1186,13 @@ export function ProductVariantSelector({ product, variants, onVariantChange }: P
             >
               {colors.map((color) => {
                 const variant = variants.find((v) => v.color === color)
-                const isSelected = selectedVariant?.color === color
+                const isSelected = selectedColor === color
                 const isAvailable = variant?.isAvailable && (variant?.stock || 0) > 0
 
                 return (
                   <button
                     key={color}
-                    onClick={() => variant && setSelectedVariant(variant)}
+                    onClick={() => handleColorSelect(color)}
                     disabled={!isAvailable}
                     className={cn(
                       "group relative h-20 w-20 rounded-full border-3 transition-all hover:scale-110 flex-shrink-0 shadow-md hover:shadow-lg",
@@ -976,14 +1248,14 @@ export function ProductVariantSelector({ product, variants, onVariantChange }: P
       {sizes.length > 0 && (
         <div>
           <h3 className="mb-4 text-sm font-bold uppercase tracking-wider">
-            Size: <span className="text-primary">{selectedVariant?.size || "Select"}</span>
+            Size: <span className="text-primary">{selectedSize || "Select"}</span>
           </h3>
           <div className="flex flex-wrap gap-3">
             {sizes.map((size) => {
-              const variant = variants.find(
-                (v) => v.size === size && (!selectedVariant?.color || v.color === selectedVariant.color),
-              )
-              const isSelected = selectedVariant?.size === size
+              const variant =
+                variants.find((v) => v.size === size && v.color === selectedColor) ||
+                variants.find((v) => v.size === size)
+              const isSelected = selectedSize === size
               const isAvailable = variant?.isAvailable && (variant?.stock || 0) > 0
 
               return (
@@ -991,7 +1263,7 @@ export function ProductVariantSelector({ product, variants, onVariantChange }: P
                   key={size}
                   variant={isSelected ? "default" : "outline"}
                   size="lg"
-                  onClick={() => variant && setSelectedVariant(variant)}
+                  onClick={() => handleSizeSelect(size)}
                   disabled={!isAvailable}
                   className={cn(
                     "font-semibold shadow-md hover:shadow-lg transition-all",
@@ -1015,9 +1287,9 @@ export function ProductVariantSelector({ product, variants, onVariantChange }: P
               <div>
                 <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Selected Variant</p>
                 <p className="text-lg font-semibold mt-1">
-                  {selectedVariant.color && `${selectedVariant.color}`}
-                  {selectedVariant.color && selectedVariant.size && " • "}
-                  {selectedVariant.size && `${selectedVariant.size}`}
+                  {selectedColor && `${selectedColor}`}
+                  {selectedColor && selectedSize && " • "}
+                  {selectedSize && `${selectedSize}`}
                 </p>
               </div>
               <div className="text-right">
@@ -1053,3 +1325,4 @@ export function ProductVariantSelector({ product, variants, onVariantChange }: P
     </div>
   )
 }
+
