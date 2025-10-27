@@ -249,6 +249,7 @@ type Product = {
 
 type ProductVariant = {
   color: string
+  colorHex: string
   size: string
   sku: string
   price: number
@@ -263,7 +264,7 @@ export function ProductForm({ product }: { product?: Product }) {
   const [imageInput, setImageInput] = useState("")
 
   const [hasVariants, setHasVariants] = useState(false)
-  const [colors, setColors] = useState<string[]>([""])
+  const [colors, setColors] = useState<Array<{ name: string; hex: string }>>([{ name: "", hex: "#FF6B6B" }])
   const [sizes, setSizes] = useState<string[]>([""])
   const [variants, setVariants] = useState<ProductVariant[]>([])
   const [uploadingImages, setUploadingImages] = useState(false)
@@ -339,16 +340,16 @@ export function ProductForm({ product }: { product?: Product }) {
   }
 
   const addColor = () => {
-    setColors([...colors, ""])
+    setColors([...colors, { name: "", hex: "#FF6B6B" }])
   }
 
   const addSize = () => {
     setSizes([...sizes, ""])
   }
 
-  const updateColor = (index: number, value: string) => {
+  const updateColor = (index: number, field: "name" | "hex", value: string) => {
     const newColors = [...colors]
-    newColors[index] = value
+    newColors[index][field] = value
     setColors(newColors)
   }
 
@@ -367,7 +368,7 @@ export function ProductForm({ product }: { product?: Product }) {
   }
 
   const generateVariants = () => {
-    const validColors = colors.filter((c) => c.trim())
+    const validColors = colors.filter((c) => c.name.trim())
     const validSizes = sizes.filter((s) => s.trim())
 
     const newVariants: ProductVariant[] = []
@@ -375,9 +376,10 @@ export function ProductForm({ product }: { product?: Product }) {
     validColors.forEach((color) => {
       validSizes.forEach((size) => {
         newVariants.push({
-          color,
+          color: color.name,
+          colorHex: color.hex,
           size,
-          sku: `${color.toUpperCase()}-${size.toUpperCase()}`,
+          sku: `${color.name.toUpperCase()}-${size.toUpperCase()}`,
           price: 0,
           stock: 0,
           images: [],
@@ -499,10 +501,27 @@ export function ProductForm({ product }: { product?: Product }) {
               <div className="space-y-2">
                 {colors.map((color, index) => (
                   <div key={index} className="flex gap-2">
+                    <div className="relative">
+                      <input
+                        type="color"
+                        value={color.hex}
+                        onChange={(e) => updateColor(index, "hex", e.target.value)}
+                        className="h-10 w-16 rounded-md border cursor-pointer"
+                        title="Pick color"
+                      />
+                    </div>
                     <Input
-                      value={color}
-                      onChange={(e) => updateColor(index, e.target.value)}
+                      value={color.name}
+                      onChange={(e) => updateColor(index, "name", e.target.value)}
                       placeholder="e.g., Forest Green, Sky Blue"
+                      className="flex-1"
+                    />
+                    <Input
+                      value={color.hex}
+                      onChange={(e) => updateColor(index, "hex", e.target.value)}
+                      placeholder="#FF6B6B"
+                      className="w-28"
+                      pattern="^#[0-9A-Fa-f]{6}$"
                     />
                     {colors.length > 1 && (
                       <Button type="button" size="icon" variant="ghost" onClick={() => removeColor(index)}>
@@ -720,3 +739,4 @@ export function ProductForm({ product }: { product?: Product }) {
     </form>
   )
 }
+
