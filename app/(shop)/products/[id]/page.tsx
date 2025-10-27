@@ -278,15 +278,12 @@
 //   )
 // }
 
+"use client"
 
 import { getProduct, getRelatedProducts } from "@/actions/products"
 import { notFound } from "next/navigation"
-import { ProductImageGallery } from "@/components/product-image-gallery"
-import { ProductVariantSelector } from "@/components/product-variant-selector"
-import { ProductInfo } from "@/components/product-info"
-import { RelatedProducts } from "@/components/related-products"
-import { ProductReviews } from "@/components/product-reviews"
 import { BackButton } from "@/components/back-button"
+import { ProductPageClient } from "@/components/product-page-client"
 
 export default async function ProductPage({
   params,
@@ -302,61 +299,13 @@ export default async function ProductPage({
 
   const relatedProducts = await getRelatedProducts(id, product.category)
 
-  const displayImages =
-    product.images && product.images.length > 0
-      ? product.images
-      : product.variants && product.variants.length > 0 && product.variants[0].images?.length > 0
-        ? product.variants[0].images
-        : ["/placeholder.svg"]
-
-  console.log("[v0] Product page - displayImages:", displayImages)
-  console.log("[v0] Product page - variants:", product.variants?.length)
-
   return (
     <div className="min-h-screen bg-background">
       <div className="container py-6">
         <BackButton />
       </div>
 
-      <div className="container py-8">
-        <div className="grid gap-8 lg:grid-cols-2">
-          <ProductImageGallery images={displayImages} productName={product.name} />
-
-          <div className="space-y-6">
-            <ProductInfo product={product} />
-
-            {product.hasVariants && product.variants && product.variants.length > 0 && (
-              <ProductVariantSelector product={product} variants={product.variants} />
-            )}
-
-            {product.tags.length > 0 && (
-              <div>
-                <h3 className="mb-2 text-sm font-medium">Tags:</h3>
-                <div className="flex flex-wrap gap-2">
-                  {product.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="inline-block bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-xs"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="mt-12">
-          <ProductReviews productId={product.id} reviews={product.reviews} />
-        </div>
-
-        {relatedProducts.length > 0 && (
-          <div className="mt-12">
-            <RelatedProducts products={relatedProducts} />
-          </div>
-        )}
-      </div>
+      <ProductPageClient product={product} relatedProducts={relatedProducts} />
     </div>
   )
 }
