@@ -1139,7 +1139,7 @@ export function ProductForm({ product }: { product?: Product }) {
                         </div>
                       </div>
 
-                      {/* Variant Images */}
+                      {/* Variant Images*/}
                       <div className="space-y-2">
                         <Label>Variant Images</Label>
                         <div className="flex gap-2">
