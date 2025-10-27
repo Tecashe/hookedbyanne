@@ -292,7 +292,7 @@ export function ProductFilters() {
         <FilterContent />
       </div>
 
-      {/* Mobile Filters */}
+      {/* Mobile Filter */}
       <div className="lg:hidden">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
