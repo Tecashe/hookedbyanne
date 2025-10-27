@@ -1,6 +1,6 @@
 "use client"
 
-import { ShoppingCart, Heart } from "lucide-react"
+import { ShoppingCart, Heart, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/hooks/use-cart"
 import { useWishlist } from "@/hooks/use-wishlist"
@@ -12,8 +12,8 @@ import Link from "next/link"
 import { Separator } from "@/components/ui/separator"
 
 export function CartWishlistIcons() {
-  const { items: cartItems, getTotal } = useCart()
-  const { items: wishlistItems, getCount } = useWishlist()
+  const { items: cartItems, getTotal, removeItem: removeFromCart } = useCart()
+  const { items: wishlistItems, getCount, removeItem: removeFromWishlist } = useWishlist()
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
   const wishlistCount = getCount()
@@ -43,19 +43,33 @@ export function CartWishlistIcons() {
             ) : (
               <div className="space-y-2 max-h-[300px] overflow-y-auto">
                 {wishlistItems.slice(0, 3).map((item) => (
-                  <Link key={item.productId} href={`/products/${item.productId}`}>
-                    <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
-                      <CardContent className="p-3 flex gap-3">
-                        <div className="relative h-16 w-16 flex-shrink-0 rounded overflow-hidden">
-                          <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm truncate">{item.name}</p>
-                          <p className="text-sm text-muted-foreground">${item.price.toFixed(2)}</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
+                  <Card key={item.productId} className="hover:bg-muted/50 transition-colors">
+                    <CardContent className="p-3 flex gap-3">
+                      <Link
+                        href={`/products/${item.productId}`}
+                        className="relative h-16 w-16 flex-shrink-0 rounded overflow-hidden"
+                      >
+                        <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover" />
+                      </Link>
+                      <div className="flex-1 min-w-0">
+                        <Link href={`/products/${item.productId}`}>
+                          <p className="font-medium text-sm truncate hover:underline">{item.name}</p>
+                        </Link>
+                        <p className="text-sm text-muted-foreground">${item.price.toFixed(2)}</p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 flex-shrink-0"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          removeFromWishlist(item.productId)
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             )}
@@ -104,6 +118,17 @@ export function CartWishlistIcons() {
                         <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
                         <p className="text-sm font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
                       </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 flex-shrink-0"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          removeFromCart(item.productId, item.variantId)
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
                     </CardContent>
                   </Card>
                 ))}
