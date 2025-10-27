@@ -96,7 +96,7 @@ import { prisma } from "@/lib/db"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Package, ShoppingCart, Users, DollarSign } from "lucide-react"
 import { RecentOrders } from "@/components/admin/recent-orders"
-import { AdminGreeting } from "@/components/admin/admin-greeting"
+
 
 export default async function AdminDashboard() {
   const [productsCount, ordersCount, customersCount, orders] = await Promise.all([
@@ -163,7 +163,7 @@ export default async function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      <AdminGreeting />
+  
 
       <div>
         <h1 className="text-3xl font-bold">Dashboard</h1>
