@@ -10,8 +10,8 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "HookedByAnn - Handmade Crochet Creations",
-  description: "Beautiful handmade crochet items crafted with love",
-  generator: "v0.app",
+  description: "Beautiful handmade crochet items by Ann",
+  generator: "IamCashe",
 }
 
 export default function RootLayout({

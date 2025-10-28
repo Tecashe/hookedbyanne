@@ -1356,6 +1356,7 @@ export async function deleteProduct(id: string) {
 export async function getProducts(filters?: {
   category?: string
   featured?: boolean
+  limit:number
   isNewArrival?: boolean
   search?: string
 }) {
